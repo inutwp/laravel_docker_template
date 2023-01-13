@@ -21,7 +21,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.traefik.rule=Host(`${DASHBOARD_DOMAIN}`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.inutwp.test`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
@@ -33,16 +33,16 @@ services:
       - 443:443
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "${CONFIG_DIR}/traefik/traefik.yml:/traefik.yml"
-      - "${CONFIG_DIR}/cred//users_cred:/users_credentials:ro"
-      - "${SSL_DIR}/acme.json:/acme.json"
+      - "./docker/config/traefik/traefik.yml:/traefik.yml"
+      - "./docker/config/cred/users_cred:/users_credentials:ro"
+      - "./docker/ssl/acme.json:/acme.json"
     networks:
       - proxy
 
   app:
     build:
       context: .
-      dockerfile: ./build/app/Dockerfile
+      dockerfile: ./docker/build/app/Dockerfile
     environment:
       - TZ=Asia/Jakarta
     restart: on-failure
@@ -57,14 +57,14 @@ services:
   webserver:
     build:
       context: .
-      dockerfile: ./build/webserver/Dockerfile
+      dockerfile: ./docker/build/webserver/Dockerfile
     environment:
       - TZ=Asia/Jakarta
     restart: on-failure
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.webserver.rule=Host(`inutwp.test`)"
       - "traefik.http.routers.webserver.entrypoints=websecure"
       - "traefik.http.routers.webserver.tls=true"
       - "traefik.http.routers.webserver.tls.certresolver=letsencrypt"

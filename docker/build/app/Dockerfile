@@ -22,11 +22,11 @@ RUN apk --update --no-cache add \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && mkdir -p /var/www/inutwp
 
-COPY /config/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/config/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 WORKDIR /var/www/inutwp
 
-COPY --chown=www-data /src/ /var/www/inutwp
+COPY --chown=www-data ./ /var/www/inutwp
 
 RUN mkdir -p /var/www/inutwp/vendor/ && \
 	chown -R www-data:www-data /var/www/inutwp \

@@ -16,7 +16,7 @@ RUN apk --update --no-cache add \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/cache/apk/*
 
-COPY /src/ /var/www/inutwp
+COPY ./ /var/www/inutwp
 
 RUN rm -rf /etc/nginx/nginx.conf \
     && rm -rf /etc/nginx/conf.d/default.conf \
@@ -24,8 +24,8 @@ RUN rm -rf /etc/nginx/nginx.conf \
     && mkdir -p /etc/nginx/sites-enabled/ \
     && ln -s /etc/nginx/sites-available/inutwp.conf /etc/nginx/sites-enabled/inutwp.conf
 
-COPY /config/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY /config/nginx/conf.d/inutwp.conf /etc/nginx/conf.d/inutwp.conf
-COPY /config/nginx/conf.d/inutwp.conf /etc/nginx/sites-available/inutwp.conf
+COPY docker/config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/config/nginx/conf.d/inutwp.conf /etc/nginx/conf.d/inutwp.conf
+COPY docker/config/nginx/conf.d/inutwp.conf /etc/nginx/sites-available/inutwp.conf
 
 WORKDIR /var/www/inutwp
