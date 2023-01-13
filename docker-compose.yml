@@ -1,0 +1,74 @@
+version: "3.9"
+
+networks:
+  proxy:
+    driver: bridge
+    name: proxy
+  internal:
+    driver: bridge
+    name: internal
+
+volumes:
+  lvstorage:
+    driver: local
+
+services:
+  traefik:
+    image: "traefik"
+    environment:
+      - TZ=Asia/Jakarta
+    restart: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.traefik.rule=Host(`${DASHBOARD_DOMAIN}`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.middlewares=auth"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.auth.basicauth.usersfile=/users_credentials"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${CONFIG_DIR}/traefik/traefik.yml:/traefik.yml"
+      - "${CONFIG_DIR}/cred//users_cred:/users_credentials:ro"
+      - "${SSL_DIR}/acme.json:/acme.json"
+    networks:
+      - proxy
+
+  app:
+    build:
+      context: .
+      dockerfile: ./build/app/Dockerfile
+    environment:
+      - TZ=Asia/Jakarta
+    restart: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.services.app.loadbalancer.server.port=9000"
+    networks:
+      - proxy
+      - internal
+
+  webserver:
+    build:
+      context: .
+      dockerfile: ./build/webserver/Dockerfile
+    environment:
+      - TZ=Asia/Jakarta
+    restart: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.webserver.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.webserver.entrypoints=websecure"
+      - "traefik.http.routers.webserver.tls=true"
+      - "traefik.http.routers.webserver.tls.certresolver=letsencrypt"
+      - "traefik.http.services.webserver.loadbalancer.server.port=1259"
+    networks:
+      - proxy
+      - internal
