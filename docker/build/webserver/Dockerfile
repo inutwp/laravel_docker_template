@@ -22,6 +22,7 @@ RUN rm -rf /etc/nginx/nginx.conf \
 COPY docker/config/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY docker/config/nginx/conf.d/inutwp.conf /etc/nginx/conf.d/inutwp.conf
 COPY docker/config/nginx/conf.d/inutwp.conf /etc/nginx/sites-available/inutwp.conf
+COPY docker/config/supervisord/supervisord_webserver.conf /etc/supervisord.conf
 
 WORKDIR /var/www/inutwp
 
@@ -37,3 +38,5 @@ RUN chmod -R 0644 /var/www/inutwp \
     && chmod -R g+w /etc/nginx
 
 USER nginx
+
+CMD ["/usr/bin/supervisord", "-n", "-c" ,"/etc/supervisord.conf"]
