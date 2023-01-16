@@ -29,6 +29,11 @@ COPY --chown=nginx:nginx ./ /var/www/inutwp
 
 RUN chmod -R 0644 /var/www/inutwp \
 	&& find /var/www/inutwp -type d -print0 | xargs -0 chmod 0755 \
-	&& chown -R nginx:nginx /run
+    && chown -R nginx:0 /var/log/nginx \
+	&& chown -R nginx:nginx /run \
+    && chown -R nginx:0 /var/cache/nginx \
+    && chmod -R g+w /var/cache/nginx \
+    && chown -R nginx:0 /etc/nginx \
+    && chmod -R g+w /etc/nginx
 
 USER nginx
